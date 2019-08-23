@@ -10,21 +10,31 @@ class View extends Component{
 
         // true ? whentrue : whennottrue;
 
-       var newClassName =  (viewName === activeView) ? 'view active ' + className : 'view ' + className;
+    //    var newClassName =  (viewName === activeView) ? 'view active ' + className : 'view ' + className;
 
-        return(
+  
+  // if active ? insert the view : dont insert the viewName
+
+        // var html
+        // if(viewName === activeView){
+        //     html =(
+        //         <div className={newClassName}>
+        //         {children}  
+        //     </div>
+        //     )
+        // }else{
+        //     null
+        // }
+       var newClassName = 'view ' + className;
+
+        return (viewName === activeView)? (
+       
             <div className={newClassName}>
                 {/* {this.props.children}   */}
                 {children}  {/* Kiko, this is the shorthand from above */}
-               
-             
             </div>
-
-        )
+        ) :null
     }
-
-
-
 }
 
 

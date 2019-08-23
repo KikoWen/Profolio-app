@@ -29,6 +29,8 @@ class App extends Component{
         description: 'Pretty project'
 
       }],
+      types:[],
+      currentType:null,
       projectToUpdate:null,
 
     };
@@ -47,11 +49,30 @@ class App extends Component{
     this.setState({projectToUpdate:foundProject});
   }
 
+  //Type
+  setCurrentType =(id) =>{
+
+    var foundType = this.state.types.find((type)=>{
+      return type.id == id;
+    });
+
+    // foundType ? setType : set null 
+    foundType ? this.setState({currentType:foundType}): this.setState({currentType:null})
+    ;
+  }
+
 //Kiko, this is to get the data, have to do componentDidMount() to call the data, otherwise, nothing will show. but this can be check in inspect, $r.getProjects().
   getProjects =()=>{
     axios.get (urlPrefix + '/projects')
     .then(res => {
       this.setState({projects:res.data});
+    })
+  }
+
+  getTypes =()=>{
+    axios.get (urlPrefix + '/types')
+    .then(res => {
+      this.setState({types:res.data});
     })
   }
 
@@ -81,9 +102,27 @@ class App extends Component{
   //Kiko, this is to call the data
   componentDidMount(){
     this.getProjects();
+    this.getTypes();
+  }
+
+  handleProjectTypeClick =(e) =>{
+    var link = e.target;
+
+    this.setCurrentType(link.dataset.type);
+    this.setActiveView('projects');
+
   }
  
 render(){
+
+  var {currentType, projects}=this.state;
+
+  if(currentType){
+    projects = projects.filter(project => {
+      return project.type_id == currentType.id
+    })
+
+  }
   return(
     <div className="app">
 		
@@ -93,10 +132,10 @@ render(){
       <i className="fas fa-plus" onClick ={() => this.setActiveView('add-project')}></i>
         <i className="fas fa-bars" onClick ={() => this.setActiveView('nav')}></i></div>
       <div className="main">
-        <h3>Projects</h3>
+        <h3>{currentType? currentType.name:'All Projects'}</h3>
 
         {
-          this.state.projects.map((project)=>{
+          projects.map((project)=>{
             var projectProps ={
               ...project,
               key: project.id,
@@ -135,7 +174,14 @@ render(){
      <div className="header"><i className="fas fa-times" onClick ={()=> this.setActiveView('projects')}></i></div>
       <div className="main">
         <ul className="menu">
-          <li><a href="#" className="color1" onClick ={()=> this.setActiveView('projects')}>Projects</a></li>
+          <li><a data-type = 'null' href="#" className="color1" onClick ={this.handleProjectTypeClick}>Projects</a></li>
+          {
+            this.state.types.map(type =>{
+              return (
+              <li><a data-type = {type.id} href="#" className="color1" onClick ={this.handleProjectTypeClick}>{type.name}</a></li>
+              )
+            })
+          }
           <li><a href="#" className="color2" onClick ={()=> this.setActiveView('add-project')}>Add new project</a></li>
         </ul>
       </div>
